@@ -1,8 +1,16 @@
 package esepunittests
 
 type GradeCalculator struct {
-	grades []Grade
+	grades      []Grade
+	gradingMode GradeCalculationMode
 }
+
+type GradeCalculationMode int
+
+const (
+	LetterGradeMode GradeCalculationMode = iota
+	PassFailMode
+)
 
 type GradeType int
 
@@ -30,12 +38,22 @@ type Grade struct {
 
 func NewGradeCalculator() *GradeCalculator {
 	return &GradeCalculator{
-		grades: make([]Grade, 0),
+		grades:      make([]Grade, 0),
+		gradingMode: LetterGradeMode,
 	}
 }
 
 func (gc *GradeCalculator) GetFinalGrade() string {
 	numericalGrade := gc.calculateNumericalGrade()
+
+	if gc.gradingMode == PassFailMode {
+		return getPassFailGrade(numericalGrade)
+	}
+
+	return getLetterGrade(numericalGrade)
+}
+
+func getLetterGrade(numericalGrade int) string {
 
 	if numericalGrade >= 90 {
 		return "A"
@@ -48,6 +66,14 @@ func (gc *GradeCalculator) GetFinalGrade() string {
 	}
 
 	return "F"
+}
+
+func getPassFailGrade(numericalGrade int) string {
+	if numericalGrade >= 70 {
+		return "Pass"
+	}
+
+	return "Fail"
 }
 
 func (gc *GradeCalculator) AddGrade(name string, grade int, gradeType GradeType) {
